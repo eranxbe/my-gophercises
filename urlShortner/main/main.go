@@ -3,8 +3,9 @@ package main
 import (
 	"fmt"
 	"net/http"
-	
-	"https://github.com/eranxbe/my-gophercises/urlShortner/urlshort"
+	"os"
+	"urlShortner/urlshort"
+	"path/filepath"
 )
 
 func defaultMux() *http.ServeMux {
@@ -19,24 +20,34 @@ func hello(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	mux := defaultMux()
-	
+	cwd, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
 	pathsToUrls := map[string]string{
-		"/url-short-godoc": "https://godoc.org/github.com/gophercises/urlshort",
+		"/urlshort-godoc": "https://godoc.org/github.com/gophercises/urlshort",
 		"/yaml-godoc": "https://godoc.org/gopkg.in/yaml.v2",
 	}
 	mapHandler := urlshort.MapHandler(pathsToUrls, mux)
 
-// 	yaml := `
-//   - path: /urlshort
-// 	url: https://github.com/gophercises/urlshort
-//   - path: /urlshort-final
-//     url: https://github.com/gophercises/uroshort/tree/final
-// 	`
-// 	yamlHandler, err := urlshort.YAMLHandler([]byte(yaml), mapHandler)
-// 	if err != nil {
-// 		panic(err)
-// 	}
-	fmt.Println("Starting the server on :8080")
-	http.ListenAndServe(":8080", mapHandler)
+	yamlContent, err := os.ReadFile(filepath.Join(cwd, "paths.yaml"))
+	if err != nil {
+		panic(err)
+	}
+	yamlHandler, err := urlshort.YAMLHandler(yamlContent, mapHandler)
+	if err != nil {
+		panic(err)
+	}
+
+	jsonContent, err := os.ReadFile(filepath.Join(cwd, "paths.json"))
+	if err != nil {
+		panic(err)
+	}
+	jsonHandler, err := urlshort.JSONHandler(jsonContent, yamlHandler)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("Starting the server on :1234")
+	http.ListenAndServe(":1234", jsonHandler)
 }
 

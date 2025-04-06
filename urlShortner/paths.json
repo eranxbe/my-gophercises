@@ -1,0 +1,14 @@
+[
+    {
+        "path": "/short-json",
+        "url": "https://youtube.com"
+    },
+    {
+        "path": "/short-json-2",
+        "url": "https://google.com"
+    },
+    {
+        "path": "/short-json-3",
+        "url": "https://nmap.org"
+    }
+]
